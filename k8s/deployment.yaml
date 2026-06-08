@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: s4hana-test-service
+  namespace: qa-environment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: s4hana-test-service
+  template:
+    metadata:
+      labels:
+        app: s4hana-test-service
+    spec:
+      # 🛡️ Kubernetes Security Hardening
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+      - name: app
+        image: eclipse-temurin:21-jre-alpine
+        ports:
+        - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
